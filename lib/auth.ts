@@ -1,14 +1,10 @@
-// lib/auth.ts
-import { supabase } from "./supabaseClient";
+import { supabase } from "@/lib/supabaseClient";
 
-export async function ensureProfile(user: any) {
-  if (!user) return;
-  const { data } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .single();
-  if (!data) {
-    await supabase.from("profiles").insert([{ id: user.id, name: user.email }]);
-  }
+export async function getUser() {
+  const { data } = await supabase.auth.getUser();
+  return data.user;
+}
+
+export async function logout() {
+  await supabase.auth.signOut();
 }
