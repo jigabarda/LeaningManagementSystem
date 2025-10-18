@@ -16,7 +16,7 @@ interface SupabaseCourseRow {
   instructor?: SupabaseInstructor | SupabaseInstructor[] | null;
 }
 
-/** ✅ Fetch all courses including instructor and image */
+/** Fetch all courses including instructor and image */
 export async function getAllCourses(): Promise<Course[]> {
   const { data, error } = await supabase
     .from("courses")
@@ -41,7 +41,7 @@ export async function getAllCourses(): Promise<Course[]> {
     const instructor = item.instructor;
 
     if (Array.isArray(instructor)) {
-      // ✅ Explicitly type the array element
+      // Explicitly type the array element
       const first: SupabaseInstructor | undefined = instructor[0];
       if (first && first.id) {
         instructorData = {
@@ -71,7 +71,7 @@ export async function getAllCourses(): Promise<Course[]> {
   });
 }
 
-/** ✅ Create a new course (with optional image upload) */
+/** Create a new course (with optional image upload) */
 export async function createCourse(
   title: string,
   description: string,

@@ -105,7 +105,7 @@ export default function Navbar() {
 
             {user ? (
               <>
-                {/* ✅ Only show “My Courses” if NOT an instructor */}
+                {/* Only show “My Courses” if NOT an instructor */}
                 {profile?.role !== "instructor" && (
                   <Link
                     href="/enrolled"

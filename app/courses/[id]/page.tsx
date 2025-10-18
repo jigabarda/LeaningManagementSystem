@@ -32,7 +32,7 @@ export default function CourseDetailPage() {
   const [newLessonFile, setNewLessonFile] = useState<File | null>(null);
   const [newLessonTitle, setNewLessonTitle] = useState("");
 
-  // ✅ Load course, profile, and lessons
+  // Load course, profile, and lessons
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -83,7 +83,7 @@ export default function CourseDetailPage() {
     loadData();
   }, [id]);
 
-  // ✅ Upload lesson file
+  // Upload lesson file
   const handleLessonUpload = async () => {
     if (!newLessonFile || !profile || !course) return;
 
@@ -94,7 +94,7 @@ export default function CourseDetailPage() {
       const fileName = `${course.id}-${Date.now()}.${fileExt}`;
       const filePath = `${course.id}/${fileName}`; // keep bucket organized by course id
 
-      // ✅ Upload to Supabase Storage
+      // Upload to Supabase Storage
       const { error: uploadError } = await supabase.storage
         .from("course_resources")
         .upload(filePath, newLessonFile, {
@@ -120,7 +120,7 @@ export default function CourseDetailPage() {
         return;
       }
 
-      // ✅ Save lesson record in DB
+      // Save lesson record in DB
       const { error: insertError } = await supabase.from("lessons").insert([
         {
           title: safeTitle,
@@ -137,7 +137,7 @@ export default function CourseDetailPage() {
 
       alert("✅ Lesson uploaded successfully!");
 
-      // ✅ Refresh lessons
+      // Refresh lessons
       const { data: updatedLessons } = await supabase
         .from("lessons")
         .select("*")
@@ -155,7 +155,7 @@ export default function CourseDetailPage() {
     }
   };
 
-  // ✅ Delete course
+  // Delete course
   const handleDeleteCourse = async () => {
     if (!confirm("Are you sure you want to delete this course?")) return;
 
@@ -171,7 +171,7 @@ export default function CourseDetailPage() {
     }
   };
 
-  // ✅ Rendering UI
+  // Rendering UI
   if (loading)
     return <div className="text-center p-6">Loading course details...</div>;
   if (error) return <div className="text-center text-red-500 p-6">{error}</div>;

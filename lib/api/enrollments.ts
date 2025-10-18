@@ -104,7 +104,7 @@ export async function listUserEnrollments(): Promise<Enrollment[]> {
     throw new Error(error.message);
   }
 
-  // ✅ Safely handle both array and object for `course`
+  // Safely handle both array and object for `course`
   const enrollments: Enrollment[] = (data ?? []).map(
     (item: RawEnrollment): Enrollment => {
       let course: Course | null = null;

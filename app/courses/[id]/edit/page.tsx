@@ -71,7 +71,7 @@ export default function EditCoursePage() {
     try {
       setSaving(true);
 
-      // ✅ Get current authenticated user
+      // Get current authenticated user
       const { data: sessionData } = await supabase.auth.getSession();
       const user = sessionData?.session?.user;
       if (!user) {
