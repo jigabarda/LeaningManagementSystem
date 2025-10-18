@@ -12,7 +12,7 @@ export interface Course {
   instructor?: Instructor | null;
   instructor_id?: string | null;
   created_at?: string;
-  /** ✅ Add this field for image support */
+  /** Add this field for image support */
   image_url?: string | null;
 }
 

@@ -28,7 +28,9 @@ export default function SignupPage() {
     if (error) {
       toast.error(error.message);
     } else {
-      toast.success("Signup successful! Please check your email for confirmation.");
+      toast.success(
+        "Signup successful! Please check your email for confirmation."
+      );
       router.push("/login");
     }
 
