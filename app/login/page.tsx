@@ -26,11 +26,11 @@ export default function LoginPage() {
     } else {
       toast.success("Login successful!");
 
-      // 🔥 Redirect first, then instantly reload the page
+      // Redirect first, then instantly reload the page
       router.push("/profile");
       setTimeout(() => {
         window.location.reload(); // instantly refresh the profile page
-      }, 500); // small delay ensures navigation happens before reload
+      }, 1000); // small delay ensures navigation happens before reload
     }
 
     setLoading(false);
