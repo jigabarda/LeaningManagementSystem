@@ -1,4 +1,3 @@
-// ...existing code...
 "use client";
 
 import Link from "next/link";
@@ -106,12 +105,15 @@ export default function Navbar() {
 
             {user ? (
               <>
-                <Link
-                  href="/enrolled"
-                  className="hover:text-blue-600 transition-colors"
-                >
-                  My Courses
-                </Link>
+                {/* ✅ Only show “My Courses” if NOT an instructor */}
+                {profile?.role !== "instructor" && (
+                  <Link
+                    href="/enrolled"
+                    className="hover:text-blue-600 transition-colors"
+                  >
+                    My Courses
+                  </Link>
+                )}
 
                 <div className="relative" ref={dropdownRef}>
                   <button
@@ -178,4 +180,3 @@ export default function Navbar() {
     </header>
   );
 }
-// ...existing code...
