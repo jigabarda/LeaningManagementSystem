@@ -25,7 +25,12 @@ export default function LoginPage() {
       toast.error(error.message);
     } else {
       toast.success("Login successful!");
+
+      // 🔥 Redirect first, then instantly reload the page
       router.push("/profile");
+      setTimeout(() => {
+        window.location.reload(); // instantly refresh the profile page
+      }, 500); // small delay ensures navigation happens before reload
     }
 
     setLoading(false);

@@ -46,24 +46,8 @@ export default function ProfilePage() {
   const [editMode, setEditMode] = useState(false);
   const router = useRouter();
 
-  // ✅ Auto refresh when user logs in
   useEffect(() => {
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (event) => {
-        if (event === "SIGNED_IN") {
-          window.location.reload(); // reload page when logged in
-        }
-      }
-    );
-
-    return () => {
-      authListener.subscription.unsubscribe();
-    };
-  }, []);
-
-  // ✅ Load profile on mount
-  useEffect(() => {
-    async function loadProfile() {
+    const loadProfile = async () => {
       setLoading(true);
       setErrorMessage(null);
 
@@ -106,12 +90,11 @@ export default function ProfilePage() {
       } finally {
         setLoading(false);
       }
-    }
+    };
 
     loadProfile();
   }, [router]);
 
-  // ✅ Handle avatar upload
   const handleAvatarUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     try {
       const file = e.target.files?.[0];
@@ -142,7 +125,6 @@ export default function ProfilePage() {
     }
   };
 
-  // ✅ Handle input change
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -151,7 +133,6 @@ export default function ProfilePage() {
     setProfile({ ...profile, [name]: value });
   };
 
-  // ✅ Save profile changes
   const handleSave = async () => {
     if (!profile) return;
     try {
@@ -175,7 +156,6 @@ export default function ProfilePage() {
     }
   };
 
-  // ✅ Loading UI
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -184,7 +164,6 @@ export default function ProfilePage() {
     );
   }
 
-  // ✅ Error UI
   if (errorMessage) {
     return (
       <div className="flex flex-col items-center justify-center h-screen text-center">
@@ -200,7 +179,6 @@ export default function ProfilePage() {
     );
   }
 
-  // ✅ Not logged in UI
   if (!profile) {
     return (
       <div className="flex flex-col items-center justify-center h-screen text-center">
@@ -217,7 +195,6 @@ export default function ProfilePage() {
     );
   }
 
-  // ✅ Main Profile UI
   return (
     <div className="max-w-lg mx-auto p-8 bg-white shadow-lg rounded-2xl mt-10">
       <h1 className="text-3xl font-bold mb-6 text-gray-900">My Profile</h1>
@@ -237,6 +214,7 @@ export default function ProfilePage() {
           </div>
         )}
 
+        {/* Show Change Avatar only when editMode is true */}
         {editMode && (
           <>
             <label
@@ -251,6 +229,7 @@ export default function ProfilePage() {
               accept="image/*"
               className="hidden"
               onChange={handleAvatarUpload}
+              title="Upload new profile picture"
             />
           </>
         )}
@@ -273,6 +252,7 @@ export default function ProfilePage() {
                 value={profile[field] ?? ""}
                 onChange={handleChange}
                 placeholder={`Enter your ${field}`}
+                title={`Edit your ${field}`}
                 className="block w-full mt-1 p-2 border rounded-md"
               />
             ) : (
@@ -292,6 +272,7 @@ export default function ProfilePage() {
               value={profile.bio ?? ""}
               onChange={handleChange}
               placeholder="Write something about yourself"
+              title="Edit your bio"
               className="block w-full mt-1 p-2 border rounded-md"
               rows={3}
             />
