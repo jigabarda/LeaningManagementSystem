@@ -31,6 +31,7 @@ export default function CourseDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [newLessonFile, setNewLessonFile] = useState<File | null>(null);
   const [newLessonTitle, setNewLessonTitle] = useState("");
+  const [isEnrolled, setIsEnrolled] = useState(false);
 
   // Load course, profile, and lessons
   useEffect(() => {
@@ -53,6 +54,16 @@ export default function CourseDetailPage() {
 
           if (profileError) throw profileError;
           setProfile(profileData);
+
+          // ✅ Check enrollment
+          const { data: enrollmentData } = await supabase
+            .from("enrollments")
+            .select("*")
+            .eq("course_id", id)
+            .eq("user_id", user.id)
+            .maybeSingle();
+
+          setIsEnrolled(!!enrollmentData);
         }
 
         const { data: courseData, error: courseError } = await supabase
@@ -92,9 +103,8 @@ export default function CourseDetailPage() {
       const safeTitle =
         newLessonTitle.trim() || `Lesson-${new Date().getTime()}`;
       const fileName = `${course.id}-${Date.now()}.${fileExt}`;
-      const filePath = `${course.id}/${fileName}`; // keep bucket organized by course id
+      const filePath = `${course.id}/${fileName}`;
 
-      // Upload to Supabase Storage
       const { error: uploadError } = await supabase.storage
         .from("course_resources")
         .upload(filePath, newLessonFile, {
@@ -109,7 +119,6 @@ export default function CourseDetailPage() {
         return;
       }
 
-      // ✅ Get public file URL
       const { data: publicUrlData } = supabase.storage
         .from("course_resources")
         .getPublicUrl(filePath);
@@ -120,7 +129,6 @@ export default function CourseDetailPage() {
         return;
       }
 
-      // Save lesson record in DB
       const { error: insertError } = await supabase.from("lessons").insert([
         {
           title: safeTitle,
@@ -137,7 +145,6 @@ export default function CourseDetailPage() {
 
       alert("✅ Lesson uploaded successfully!");
 
-      // Refresh lessons
       const { data: updatedLessons } = await supabase
         .from("lessons")
         .select("*")
@@ -149,9 +156,51 @@ export default function CourseDetailPage() {
       setNewLessonTitle("");
     } catch (err) {
       console.error("Lesson upload error:", err);
-      alert(
-        "Unexpected error occurred during upload. Check console for details."
-      );
+      alert("Unexpected error during upload. Check console for details.");
+    }
+  };
+
+  // Enroll in course
+  const handleEnroll = async () => {
+    if (!profile) {
+      alert("Please log in first.");
+      return;
+    }
+
+    try {
+      const { error } = await supabase.from("enrollments").insert([
+        {
+          course_id: id,
+          user_id: profile.id,
+        },
+      ]);
+
+      if (error) throw error;
+      alert("✅ Successfully enrolled in this course!");
+      setIsEnrolled(true);
+    } catch (err) {
+      console.error("Error enrolling:", err);
+      alert("❌ Failed to enroll in course.");
+    }
+  };
+
+  // Unenroll from course
+  const handleUnenroll = async () => {
+    if (!profile) return;
+
+    try {
+      const { error } = await supabase
+        .from("enrollments")
+        .delete()
+        .eq("course_id", id)
+        .eq("user_id", profile.id);
+
+      if (error) throw error;
+      alert("✅ You have unenrolled from this course.");
+      setIsEnrolled(false);
+    } catch (err) {
+      console.error("Error unenrolling:", err);
+      alert("❌ Failed to unenroll from course.");
     }
   };
 
@@ -171,7 +220,6 @@ export default function CourseDetailPage() {
     }
   };
 
-  // Rendering UI
   if (loading)
     return <div className="text-center p-6">Loading course details...</div>;
   if (error) return <div className="text-center text-red-500 p-6">{error}</div>;
@@ -181,7 +229,7 @@ export default function CourseDetailPage() {
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
-      {/* Course Header */}
+      {/* Header */}
       <div className="flex items-start gap-6">
         {course.image_url ? (
           <Image
@@ -204,7 +252,8 @@ export default function CourseDetailPage() {
             Instructor: {course.instructor?.name ?? "Unknown"}
           </p>
 
-          {isInstructor && (
+          {/* Instructor or Student Buttons */}
+          {isInstructor ? (
             <div className="mt-4 flex gap-3">
               <Link
                 href={`/courses/${course.id}/edit`}
@@ -219,11 +268,29 @@ export default function CourseDetailPage() {
                 Delete Course
               </button>
             </div>
+          ) : (
+            <div className="mt-4">
+              {isEnrolled ? (
+                <button
+                  onClick={handleUnenroll}
+                  className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition"
+                >
+                  Unenroll
+                </button>
+              ) : (
+                <button
+                  onClick={handleEnroll}
+                  className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition"
+                >
+                  Enroll
+                </button>
+              )}
+            </div>
           )}
         </div>
       </div>
 
-      {/* Lessons List */}
+      {/* Lessons */}
       <div>
         <h2 className="text-2xl font-semibold mt-8 mb-4 text-gray-900">
           Course Resources
@@ -259,7 +326,7 @@ export default function CourseDetailPage() {
         )}
       </div>
 
-      {/* Upload Section (Instructors Only) */}
+      {/* Instructor Upload */}
       {isInstructor && (
         <div className="mt-8 border-t pt-6">
           <h3 className="text-xl font-semibold mb-4 text-gray-800">
