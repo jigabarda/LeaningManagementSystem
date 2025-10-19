@@ -21,7 +21,7 @@ Authentication, database management, and file storage are handled seamlessly via
 
 Below is a simplified **Entity Relationship Diagram (ERD)** for the system:
 
-![Data Model]([https://example.com/image.png](https://drive.google.com/file/d/1IvP9f99-cU9DJj09r-ik0OEbDa1ayP75/view?usp=sharing))
+![Data Model](https://drive.google.com/uc?export=view&id=1IvP9f99-cU9DJj09r-ik0OEbDa1ayP75)
 
 ## Access Control Notes (RLS)
 Row Level Security (RLS) ensures that only authorized users can modify their own data.
